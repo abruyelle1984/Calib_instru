@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-const APP_VERSION="v4"; // keep in sync with VERSION in sw.js
+const APP_VERSION="v5"; // keep in sync with VERSION in sw.js
 const $=s=>document.querySelector(s);
 const CHECKS=[["sph","Circular level"],["elec","Electronic level"],["plumb","Laser plummet centered"],
   ["tribrach","Tribrach and tripod (play, screws)"],["reticle","Reticle sharp, no parallax"],["optics","Optics clean"]];
@@ -274,7 +274,18 @@ $("#restore").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(
   renderForm();updateSave();show("reg");
   openDB().then(d=>{idb=d;loadAll()}).catch(()=>{const n=$("#dbnotice");n.hidden=false;n.textContent="Local storage is blocked (private browsing?). Checks can't be saved on this device, but reports can still be downloaded."});
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
-  if("serviceWorker" in navigator&&location.protocol!=="file:"){navigator.serviceWorker.register("sw.js").catch(()=>{});
+  if("serviceWorker" in navigator&&location.protocol!=="file:"){
+    let reg=null;navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{reg=r}).catch(()=>{});
+    // Installed apps are often resumed, not relaunched: look for updates whenever the app comes back to the foreground.
+    const check=()=>{if(reg&&navigator.onLine)reg.update().catch(()=>{})};
+    document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")check()});
+    setInterval(check,30*60*1000);
+    $("#btn-update").onclick=async()=>{if(!navigator.onLine){toast("No network: connect, then try again.");return}
+      if(!reg){toast("Update service not ready yet, try again in a few seconds.");return}
+      toast("Checking for updates…");
+      try{await reg.update();const w=reg.installing||reg.waiting;
+        if(w){toast("New version found, installing…");if(reg.waiting)reg.waiting.postMessage("skipWaiting")}
+        else toast("You have the latest version ("+APP_VERSION+").")}catch(e){toast("Update check failed: "+(e.message||e))}};
     let reloaded=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(reloaded)return;
       if(dirty){toast("Update ready: save your check, then reopen the app.");return}
       reloaded=true;try{sessionStorage.setItem("tsc-updated","1")}catch(e){}location.reload()})}
