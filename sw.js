@@ -1,6 +1,7 @@
 // TS Check service worker: offline-first app shell.
-// Bump VERSION on every release so phones pick up the new files.
-const VERSION = "ts-check-v2";
+// Bump VERSION on every release so phones pick up the new files,
+// and set the same value in APP_VERSION at the top of app.js (shown in the app).
+const VERSION = "ts-check-v3";
 const FILES = [
   "./", "./index.html", "./app.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-maskable-512.png", "./icons/apple-touch-icon.png",

@@ -1,5 +1,6 @@
 (function(){
 "use strict";
+const APP_VERSION="v3"; // keep in sync with VERSION in sw.js
 const $=s=>document.querySelector(s);
 const CHECKS=[["sph","Circular level"],["elec","Electronic level"],["plumb","Laser plummet centered"],
   ["tribrach","Tribrach and tripod (play, screws)"],["reticle","Reticle sharp, no parallax"],["optics","Optics clean"]];
@@ -270,7 +271,11 @@ $("#restore").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(
   openDB().then(d=>{idb=d;loadAll()}).catch(()=>{const n=$("#dbnotice");n.hidden=false;n.textContent="Local storage is blocked (private browsing?). Checks can't be saved on this device, but reports can still be downloaded."});
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   if("serviceWorker" in navigator&&location.protocol!=="file:"){navigator.serviceWorker.register("sw.js").catch(()=>{});
-    let reloaded=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(reloaded||dirty)return;reloaded=true;location.reload()})}
+    let reloaded=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(reloaded)return;
+      if(dirty){toast("Update ready: save your check, then reopen the app.");return}
+      reloaded=true;try{sessionStorage.setItem("tsc-updated","1")}catch(e){}location.reload()})}
+  $("#appver").textContent="TS Check "+APP_VERSION;
+  try{if(sessionStorage.getItem("tsc-updated")){sessionStorage.removeItem("tsc-updated");setTimeout(()=>toast("App updated to "+APP_VERSION),400)}}catch(e){}
   const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
   if(!standalone){const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);$("#installhint").textContent=ios?"Install: Share button, then \u201cAdd to Home Screen\u201d.":"Install: browser menu, then \u201cInstall app\u201d or \u201cAdd to Home screen\u201d."}
 })();

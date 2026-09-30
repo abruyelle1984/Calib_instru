@@ -35,7 +35,8 @@ Open it once while online; after that it works offline.
   install it, and keep JSON backups.
 
 ## Updating the app
-Replace the files on the server and change `VERSION` in `sw.js` (e.g. `ts-check-v2`).
+Replace the files on the server, change `VERSION` in `sw.js` (e.g. `ts-check-v4`) and `APP_VERSION` in `app.js` (e.g. `v4`).
+The version is shown in the Log screen; after an update the app shows "App updated to v4".
 Phones update automatically the next time the app is opened online.
 
 ## Security notes
