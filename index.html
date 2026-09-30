@@ -307,7 +307,7 @@ td.num,th.num{text-align:right}
             <label class="f">Angle input
               <select data-bind="meta.unit"><option value="dms">DMS (DDD.MMSS)</option><option value="deg">Decimal degrees</option><option value="gon">Gon</option></select></label>
             <label class="f">Distance unit
-              <select data-bind="meta.dist"><option value="ft">International ft</option><option value="ftUS">US survey ft</option><option value="m">Meters</option></select></label>
+              <select data-bind="meta.dist" id="distsel"><option value="ftUS">US survey feet</option><option value="m">Meters</option></select></label>
             <label class="f">Temperature<span style="display:flex;gap:6px"><input data-bind="meta.temp" inputmode="decimal"><select data-bind="meta.tempU" style="width:auto"><option value="F">°F</option><option value="C">°C</option></select></span></label>
             <label class="f">Pressure<span style="display:flex;gap:6px"><input data-bind="meta.pressure" inputmode="decimal"><select data-bind="meta.pressU" style="width:auto"><option value="inHg">inHg</option><option value="hPa">hPa</option></select></span></label>
             <label class="f">Factor k (tolerance = k × spec)<input data-bind="meta.k" inputmode="decimal"></label>
@@ -316,7 +316,7 @@ td.num,th.num{text-align:right}
 
         <div class="step">
           <h2><span class="n">3</span>Horizontal collimation and vertical index</h2>
-          <p class="hint">Near-horizontal sight (within ±9°), target at 150–300 ft. Read face left then face right, over several sets. V is the zenith angle.</p>
+          <p class="hint">Near-horizontal sight (within ±9°), target at <span id="tgtdist">150–300 US ft</span>. Read face left then face right, over several sets. V is the zenith angle.</p>
           <div class="tablewrap" id="t-coll"></div>
           <button class="btn small addrow" data-add="coll">Add set</button>
         </div>

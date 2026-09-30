@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-const APP_VERSION="v3"; // keep in sync with VERSION in sw.js
+const APP_VERSION="v4"; // keep in sync with VERSION in sw.js
 const $=s=>document.querySelector(s);
 const CHECKS=[["sph","Circular level"],["elec","Electronic level"],["plumb","Laser plummet centered"],
   ["tribrach","Tribrach and tripod (play, screws)"],["reticle","Reticle sharp, no parallax"],["optics","Optics clean"]];
@@ -13,11 +13,11 @@ function plusMonths(iso,m){const d=new Date(iso+"T12:00:00");d.setMonth(d.getMon
 function blank(){const t=today();let L={};try{L=JSON.parse(localStorage.getItem("tsc-last")||"{}")}catch(e){}
   const o={id:null,meta:{brand:"",model:"",serial:"",inventory:"",firmware:"",sigma:"1",edmA:"1",edmB:"1.5",prism:"",
     company:"",project:"",place:"",operator:"",date:t,nextDate:plusMonths(t,6),temp:"",tempU:"F",pressure:"",pressU:"inHg",
-    unit:"dms",dist:"ft",k:"3",adjusted:"",signBy:"",remarks:""},
+    unit:"dms",dist:"ftUS",k:"3",adjusted:"",signBy:"",remarks:""},
     coll:[row4(),row4(),row4()],tilt:[row4(),row4()],atr:[],comp:{l:"",t:""},
     edm:[{name:"",ref:"",mes:""},{name:"",ref:"",mes:""},{name:"",ref:"",mes:""}],
     plumb:{h:"5",dev:"",tol:"1.0"},checks:{}};
-  ["company","project","place","operator","unit","dist","tempU","pressU","k","signBy"].forEach(k=>{if(L[k])o.meta[k]=L[k]});return o}
+  ["company","project","place","operator","unit","dist","tempU","pressU","k","signBy"].forEach(k=>{if(L[k]&&!(k==="dist"&&L[k]==="ft"))o.meta[k]=L[k]});return o}
 function row4(){return{hz1:"",v1:"",hz2:"",v2:""}}
 function num(s){if(s===undefined||s===null)return NaN;const t=String(s).trim().replace(",",".");return t===""?NaN:Number(t)}
 function ok(x){return Number.isFinite(x)}
@@ -92,7 +92,11 @@ function edmTable(){const rows=state.edm,du=DU[state.meta.dist];
   }<tr class="tfoot"><td colspan="6" id="edm-sum">—</td></tr></tbody></table>`:`<div class="empty" style="padding:18px">No distances yet.</div>`}
 function renderChecks(){$("#checks").innerHTML=CHECKS.map(([k,l])=>`<div class="check"><span>${l}</span><select data-check="${k}" aria-label="${l}"><option value="">—</option><option value="ok">Pass</option><option value="nok">Fail</option><option value="na">N/A</option></select></div>`).join("");
   document.querySelectorAll("[data-check]").forEach(s=>s.value=state.checks[s.dataset.check]||"")}
-function renderForm(){document.querySelectorAll("[data-bind]").forEach(el=>{el.value=get(el.dataset.bind)??""});
+function renderForm(){
+  const ds=$("#distsel"),leg=ds.querySelector('option[value="ft"]');
+  if(state.meta.dist==="ft"&&!leg)ds.insertAdjacentHTML("beforeend",'<option value="ft">International ft (older check)</option>');
+  if(state.meta.dist!=="ft"&&leg)leg.remove();
+  $("#tgtdist").textContent=state.meta.dist==="m"?"50–100 m":"150–300 "+DU[state.meta.dist];document.querySelectorAll("[data-bind]").forEach(el=>{el.value=get(el.dataset.bind)??""});
   document.querySelectorAll(".au").forEach(e=>e.textContent=AU());document.querySelectorAll(".du").forEach(e=>e.textContent=DU[state.meta.dist]);
   angleTable("coll",[["c","c"],["i","i"]]);angleTable("tilt",[["a","a"]]);angleTable("atr",[["c","c ATR"],["i","i ATR"]]);
   edmTable();renderChecks();refresh()}
