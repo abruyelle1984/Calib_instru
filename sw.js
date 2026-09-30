@@ -1,8 +1,8 @@
 // TS Check service worker: offline-first app shell.
 // Bump VERSION on every release so phones pick up the new files.
-const VERSION = "ts-check-v1";
+const VERSION = "ts-check-v2";
 const FILES = [
-  "./", "./index.html", "./manifest.webmanifest",
+  "./", "./index.html", "./app.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-maskable-512.png", "./icons/apple-touch-icon.png",
   "./fonts/archivo-latin-400-normal.woff2", "./fonts/archivo-latin-500-normal.woff2",
   "./fonts/archivo-latin-600-normal.woff2", "./fonts/archivo-latin-700-normal.woff2",

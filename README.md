@@ -5,7 +5,8 @@ tilting axis, compensator, ATR, EDM baseline, laser plummet, printable report.
 Works offline once installed. Data is stored on each phone (IndexedDB).
 
 ## Files
-- `index.html` – the app
+- `index.html` – the app page
+- `app.js` – the app logic
 - `manifest.webmanifest`, `sw.js` – install + offline support
 - `icons/`, `fonts/` – bundled so the app works with no network
 
@@ -36,3 +37,10 @@ Open it once while online; after that it works offline.
 ## Updating the app
 Replace the files on the server and change `VERSION` in `sw.js` (e.g. `ts-check-v2`).
 Phones update automatically the next time the app is opened online.
+
+## Security notes
+- Enable two-factor authentication on the GitHub account that hosts the app: whoever can push
+  to the repository can change the app on every phone.
+- Use a dedicated GitHub account or organization for this app (all repositories of one account
+  share the same `*.github.io` origin, and therefore the same browser storage).
+- Never upload backups (JSON) or exported logs (CSV) to the repository: it is public.
