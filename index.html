@@ -83,6 +83,7 @@ main{max-width:1240px;margin:0 auto;padding:26px 20px 80px}
 .step .hint{color:var(--ink-2);font-size:14px;margin:0 0 14px;max-width:72ch}
 .fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px 18px}
 label.f{display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:var(--ink-2);font-weight:500}
+label.f[hidden]{display:none}
 label.f input,label.f select,label.f textarea,.cell{border:0;border-bottom:1.5px solid var(--rule);background:var(--field);border-radius:0;padding:5px 2px;font-size:15.5px;color:var(--ink);width:100%}
 label.f input:focus,label.f select:focus,.cell:focus{border-bottom-color:var(--flag);outline:none}
 label.f select option{background:var(--page);color:var(--ink)}
@@ -283,6 +284,7 @@ td.num,th.num{text-align:right}
         <div class="step">
           <h2><span class="n">1</span>Instrument</h2>
           <p class="hint">Manufacturer specifications drive the tolerances.</p>
+          <label class="f" id="instpick" style="max-width:420px;margin-bottom:14px" hidden>My instruments<select id="instsel"></select></label>
           <div class="fields">
             <label class="f">Make<input data-bind="meta.brand" placeholder="Leica, Trimble…"></label>
             <label class="f">Model<input data-bind="meta.model" placeholder="TS16, S9…"></label>
@@ -397,6 +399,7 @@ td.num,th.num{text-align:right}
   </section>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="instruments.js" defer></script>
 <script src="app.js" defer></script>
 </body>
 </html>

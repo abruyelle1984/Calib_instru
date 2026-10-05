@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-const APP_VERSION="v5"; // keep in sync with VERSION in sw.js
+const APP_VERSION="v6"; // keep in sync with VERSION in sw.js
 const $=s=>document.querySelector(s);
 const CHECKS=[["sph","Circular level"],["elec","Electronic level"],["plumb","Laser plummet centered"],
   ["tribrach","Tribrach and tripod (play, screws)"],["reticle","Reticle sharp, no parallax"],["optics","Optics clean"]];
@@ -92,7 +92,19 @@ function edmTable(){const rows=state.edm,du=DU[state.meta.dist];
   }<tr class="tfoot"><td colspan="6" id="edm-sum">—</td></tr></tbody></table>`:`<div class="empty" style="padding:18px">No distances yet.</div>`}
 function renderChecks(){$("#checks").innerHTML=CHECKS.map(([k,l])=>`<div class="check"><span>${l}</span><select data-check="${k}" aria-label="${l}"><option value="">—</option><option value="ok">Pass</option><option value="nok">Fail</option><option value="na">N/A</option></select></div>`).join("");
   document.querySelectorAll("[data-check]").forEach(s=>s.value=state.checks[s.dataset.check]||"")}
+/* instrument list (instruments.js): picking one fills step 1, fields stay editable */
+const INST_F=["brand","model","serial","inventory","firmware","sigma","edmA","edmB","prism"];
+function instList(){return Array.isArray(window.INSTRUMENTS)?window.INSTRUMENTS.filter(x=>x&&typeof x==="object"):[]}
+function instLabel(x){return [x.brand,x.model].filter(Boolean).join(" ")+(x.serial?" · S/N "+x.serial:"")+(x.inventory?" · "+x.inventory:"")}
+function renderInstSel(){const L=instList();$("#instpick").hidden=!L.length;if(!L.length)return;
+  $("#instsel").innerHTML=`<option value="">Manual entry</option>`+L.map((x,i)=>`<option value="${i}">${esc(instLabel(x)||"Instrument "+(i+1))}</option>`).join("");syncInstSel()}
+function syncInstSel(){const m=state.meta,eq=(a,b)=>String(a??"").trim().toLowerCase()===String(b??"").trim().toLowerCase();
+  const i=instList().findIndex(x=>x.serial?eq(x.serial,m.serial):(x.brand||x.model)&&eq(x.brand,m.brand)&&eq(x.model,m.model));
+  $("#instsel").value=i<0?"":String(i)}
+$("#instsel").onchange=e=>{const x=instList()[+e.target.value];if(e.target.value===""||!x)return;
+  INST_F.forEach(k=>{if(x[k]!==undefined&&x[k]!==null)state.meta[k]=String(x[k])});renderForm();markDirty()};
 function renderForm(){
+  renderInstSel();
   const ds=$("#distsel"),leg=ds.querySelector('option[value="ft"]');
   if(state.meta.dist==="ft"&&!leg)ds.insertAdjacentHTML("beforeend",'<option value="ft">International ft (older check)</option>');
   if(state.meta.dist!=="ft"&&leg)leg.remove();
@@ -185,7 +197,7 @@ function updateSave(){$("#savestate").textContent=dirty?"Unsaved changes":state.
 let draftT;function saveDraft(){clearTimeout(draftT);draftT=setTimeout(()=>{try{localStorage.setItem("tsc-draft",JSON.stringify(state))}catch(e){}},400)}
 function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("on"),2600)}
 document.addEventListener("input",e=>{const el=e.target;
-  if(el.dataset.bind){set(el.dataset.bind,el.value);if(["meta.unit","meta.dist"].includes(el.dataset.bind))renderForm();else refresh();markDirty()}
+  if(el.dataset.bind){set(el.dataset.bind,el.value);if(["meta.unit","meta.dist"].includes(el.dataset.bind))renderForm();else{refresh();if(el.dataset.bind.startsWith("meta."))syncInstSel()}markDirty()}
   else if(el.dataset.arr){state[el.dataset.arr][+el.dataset.i][el.dataset.f]=el.value;refresh();markDirty()}
   else if(el.dataset.check){if(el.value)state.checks[el.dataset.check]=el.value;else delete state.checks[el.dataset.check];refresh();markDirty()}});
 document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
